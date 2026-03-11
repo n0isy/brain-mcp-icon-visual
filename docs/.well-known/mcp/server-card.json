@@ -1,0 +1,46 @@
+{
+  "serverInfo": {
+    "name": "mcp-icon-visual",
+    "version": "0.1.1"
+  },
+  "tools": [
+    {
+      "name": "search_icons",
+      "description": "Semantic icon search. Returns a 4x4 PNG grid (512x512, cells 0-15) and a mapping of cell numbers to SVG URLs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "keyword": {"type": "string", "description": "Semantic search query"},
+          "background": {"type": "string", "default": "#FFFFFF"},
+          "color": {"type": ["string", "null"], "default": null}
+        },
+        "required": ["keyword"]
+      }
+    },
+    {
+      "name": "get_svg",
+      "description": "Retrieve raw SVG markup from any source. Returns the complete SVG string.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "source": {"type": "string", "description": "URL, Iconify ID, file path, or inline SVG"}
+        },
+        "required": ["source"]
+      }
+    },
+    {
+      "name": "render_grid",
+      "description": "Render 1-16 SVGs onto a 4x4 comparison grid (512x512, cells 0-15).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sources": {"type": "array", "items": {"type": "string"}, "description": "1-16 SVG sources"},
+          "background": {"type": "string", "default": "#FFFFFF"}
+        },
+        "required": ["sources"]
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}
