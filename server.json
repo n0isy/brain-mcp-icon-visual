@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.n0isy/mcp-icon-visual",
+  "description": "MCP server for icon search, comparison & rendering. Gives AI agents the ability to search, retrieve, compare, and render SVG icons visually.",
+  "repository": {
+    "url": "https://github.com/n0isy/brain-mcp-icon-visual",
+    "source": "github"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@br-ai-n/mcp-icon-visual",
+      "version": "0.1.1",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

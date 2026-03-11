@@ -1,6 +1,7 @@
 {
   "name": "@br-ai-n/mcp-icon-visual",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "mcpName": "io.github.n0isy/mcp-icon-visual",
   "description": "MCP server for icon search, comparison & rendering",
   "bin": {
     "mcp-icon-visual": "bin/mcp-icon-visual"
