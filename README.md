@@ -6,6 +6,12 @@ Combines local filesystem access with a remote rendering API to resolve SVGs fro
 
 The key insight: every tool returns **images**. A vision-capable LLM doesn't just get metadata — it *sees* the icons. This turns icon selection from guesswork into a visual conversation.
 
+<p align="center">
+  <img src="docs/search-grid-example.png" alt="search_icons result for 'machine learning' — 4x4 grid with 16 icons" width="512" />
+  <br/>
+  <em><code>search_icons("machine learning")</code> — 4x4 grid, cells 0–15, returned as PNG</em>
+</p>
+
 ## Agent Pipelines
 
 These tools are designed to be composed by AI agents with vision. Below are three proven patterns.
