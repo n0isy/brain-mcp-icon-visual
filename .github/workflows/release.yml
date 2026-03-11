@@ -96,7 +96,7 @@ jobs:
       - name: Sync version from Cargo.toml
         run: |
           VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
-          cd npm && npm version "$VERSION" --no-git-tag-version
+          cd npm && npm version "$VERSION" --no-git-tag-version --allow-same-version
 
       - name: Publish
         run: cd npm && npm publish --access public
