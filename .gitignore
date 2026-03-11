@@ -15,9 +15,8 @@
 npm/platform/*/mcp-icon-visual
 npm/platform/*/mcp-icon-visual.exe
 
-# npm platform binaries (built by CI)
-npm/platform/*/mcp-icon-visual
-npm/platform/*/mcp-icon-visual.exe
+# MCP Registry tokens
+.mcpregistry_*
 
 # OS
 .DS_Store
