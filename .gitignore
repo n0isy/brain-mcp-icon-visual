@@ -1,0 +1,16 @@
+# Rust
+/target
+
+# Claude Code
+.claude
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

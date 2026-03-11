@@ -1,0 +1,24 @@
+[package]
+name = "mcp-icon-visual"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rmcp = { version = "1", features = ["server", "transport-io"] }
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+schemars = "1"
+clap = { version = "4", features = ["derive"] }
+base64 = "0.22"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+thiserror = "2"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+opt-level = "z"
+panic = "abort"
