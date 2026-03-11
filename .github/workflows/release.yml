@@ -23,11 +23,11 @@ jobs:
             binary: mcp-icon-visual
             use-cross: true
           - target: x86_64-apple-darwin
-            runner: macos-15-large
+            runner: macos-15
             platform: darwin-x64
             binary: mcp-icon-visual
           - target: aarch64-apple-darwin
-            runner: macos-latest
+            runner: macos-15
             platform: darwin-arm64
             binary: mcp-icon-visual
           - target: x86_64-pc-windows-msvc
