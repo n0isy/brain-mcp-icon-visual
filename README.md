@@ -1,5 +1,9 @@
 # mcp-icon-visual
 
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-published-6f42c1)](https://registry.modelcontextprotocol.io/?q=io.github.n0isy/mcp-icon-visual)
+[![npm](https://img.shields.io/npm/v/@br-ai-n/mcp-icon-visual)](https://www.npmjs.com/package/@br-ai-n/mcp-icon-visual)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 MCP server that gives AI agents the ability to **search**, **retrieve**, **compare**, and **render** SVG icons. Built with Rust and the [rmcp](https://github.com/modelcontextprotocol/rust-sdk) SDK.
 
 Combines local filesystem access with a remote rendering API to resolve SVGs from any source — inline strings, URLs, local files, or [Iconify](https://iconify.design/) IDs — and render them onto visual comparison grids.
