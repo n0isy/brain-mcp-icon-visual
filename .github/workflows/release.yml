@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-musl
+            runner: ubuntu-latest
+            platform: linux-x64
+            binary: mcp-icon-visual
+          - target: aarch64-unknown-linux-musl
+            runner: ubuntu-latest
+            platform: linux-arm64
+            binary: mcp-icon-visual
+          - target: x86_64-apple-darwin
+            runner: macos-13
+            platform: darwin-x64
+            binary: mcp-icon-visual
+          - target: aarch64-apple-darwin
+            runner: macos-latest
+            platform: darwin-arm64
+            binary: mcp-icon-visual
+          - target: x86_64-pc-windows-msvc
+            runner: windows-latest
+            platform: win32-x64
+            binary: mcp-icon-visual.exe
+
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install musl tools (Linux)
+        if: contains(matrix.target, 'linux-musl')
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Install aarch64 cross toolchain (Linux arm64)
+        if: matrix.target == 'aarch64-unknown-linux-musl'
+        run: |
+          wget -q https://musl.cc/aarch64-linux-musl-cross.tgz -O /tmp/musl-cross.tgz
+          sudo tar xzf /tmp/musl-cross.tgz -C /opt
+          echo "/opt/aarch64-linux-musl-cross/bin" >> $GITHUB_PATH
+
+      # Remove .cargo/config.toml to avoid rust-lld conflicts with proc-macro host builds
+      - name: Remove cargo config (Linux)
+        if: runner.os == 'Linux'
+        run: rm -f .cargo/config.toml
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+        env:
+          CC_aarch64_unknown_linux_musl: ${{ matrix.target == 'aarch64-unknown-linux-musl' && 'aarch64-linux-musl-gcc' || '' }}
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER: ${{ matrix.target == 'aarch64-unknown-linux-musl' && 'aarch64-linux-musl-gcc' || '' }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}
+          path: target/${{ matrix.target }}/release/${{ matrix.binary }}
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Place binaries
+        run: |
+          for platform in linux-x64 linux-arm64 darwin-x64 darwin-arm64 win32-x64; do
+            cp artifacts/${platform}/* npm/platform/${platform}/
+            chmod +x npm/platform/${platform}/* 2>/dev/null || true
+          done
+
+      - name: Sync version from Cargo.toml
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          cd npm && npm version "$VERSION" --no-git-tag-version
+
+      - name: Publish
+        run: cd npm && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  github-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Package archives
+        run: |
+          mkdir -p release
+          for platform in linux-x64 linux-arm64 darwin-x64 darwin-arm64; do
+            chmod +x artifacts/${platform}/mcp-icon-visual
+            tar czf release/mcp-icon-visual-${platform}.tar.gz -C artifacts/${platform} mcp-icon-visual
+          done
+          cd artifacts/win32-x64 && zip ../../release/mcp-icon-visual-win32-x64.zip mcp-icon-visual.exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true

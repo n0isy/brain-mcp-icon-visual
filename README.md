@@ -204,13 +204,29 @@ All grid outputs are **512x512 PNG** images with a **4x4 layout** (128x128 cells
 
 Cell numbers appear at the bottom-left of each cell. Unused cells show the number only.
 
-## Build
+## Installation
 
-Requires Rust (edition 2024) and the `x86_64-unknown-linux-musl` target:
+### npx (recommended)
+
+No build needed. Works on Linux (x64/arm64), macOS (Intel/Apple Silicon), and Windows (x64).
+
+```json
+{
+  "mcpServers": {
+    "icon-visual": {
+      "command": "npx",
+      "args": ["-y", "@br-ai-n/mcp-icon-visual"]
+    }
+  }
+}
+```
+
+### From source
+
+Requires Rust (edition 2024):
 
 ```bash
-rustup target add x86_64-unknown-linux-musl
-cargo build --release
+cargo build --release --target x86_64-unknown-linux-musl
 ```
 
 The release profile produces a fully static binary (musl libc, `rustls-tls`, LTO, stripped).
@@ -235,7 +251,8 @@ The server communicates over **stdio** using the MCP protocol.
 {
   "mcpServers": {
     "icon-visual": {
-      "command": "/path/to/mcp-icon-visual"
+      "command": "npx",
+      "args": ["-y", "@br-ai-n/mcp-icon-visual"]
     }
   }
 }

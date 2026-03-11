@@ -1,0 +1,54 @@
+# ── Cross-compile build for Linux x64, Linux arm64, Windows x64 ──
+# macOS targets require native runners (GitHub Actions), not Docker.
+#
+# Usage:
+#   docker build -f Dockerfile.build --output npm/platform .
+
+FROM rust:1.93-alpine AS base
+
+RUN apk add --no-cache musl-dev mingw-w64-gcc
+
+# aarch64 musl cross toolchain
+RUN wget -q https://musl.cc/aarch64-linux-musl-cross.tgz -O /tmp/musl-cross.tgz && \
+    tar xzf /tmp/musl-cross.tgz -C /opt && \
+    rm /tmp/musl-cross.tgz
+ENV PATH="/opt/aarch64-linux-musl-cross/bin:${PATH}"
+
+RUN rustup target add \
+    x86_64-unknown-linux-musl \
+    aarch64-unknown-linux-musl \
+    x86_64-pc-windows-gnu
+
+WORKDIR /app
+
+# Copy manifests first for layer caching (skip .cargo/config.toml — it conflicts with cross-compile)
+COPY Cargo.toml Cargo.lock ./
+RUN mkdir src && echo 'fn main() {}' > src/main.rs
+RUN cargo build --release --target x86_64-unknown-linux-musl 2>/dev/null || true
+RUN rm -rf src
+
+# Copy real source
+COPY src/ src/
+
+# ── Linux x64 (musl, static) ──
+FROM base AS linux-x64
+RUN touch src/main.rs && \
+    cargo build --release --target x86_64-unknown-linux-musl
+
+# ── Linux arm64 (musl, static) ──
+FROM base AS linux-arm64
+RUN touch src/main.rs && \
+    CC_aarch64_unknown_linux_musl=aarch64-linux-musl-gcc \
+    CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-musl-gcc \
+    cargo build --release --target aarch64-unknown-linux-musl
+
+# ── Windows x64 (mingw) ──
+FROM base AS win32-x64
+RUN touch src/main.rs && \
+    cargo build --release --target x86_64-pc-windows-gnu
+
+# ── Collect binaries ──
+FROM scratch AS output
+COPY --from=linux-x64   /app/target/x86_64-unknown-linux-musl/release/mcp-icon-visual     /linux-x64/mcp-icon-visual
+COPY --from=linux-arm64  /app/target/aarch64-unknown-linux-musl/release/mcp-icon-visual    /linux-arm64/mcp-icon-visual
+COPY --from=win32-x64    /app/target/x86_64-pc-windows-gnu/release/mcp-icon-visual.exe     /win32-x64/mcp-icon-visual.exe

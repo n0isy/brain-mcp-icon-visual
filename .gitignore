@@ -11,6 +11,14 @@
 *.swo
 *~
 
+# npm platform binaries (built by CI)
+npm/platform/*/mcp-icon-visual
+npm/platform/*/mcp-icon-visual.exe
+
+# npm platform binaries (built by CI)
+npm/platform/*/mcp-icon-visual
+npm/platform/*/mcp-icon-visual.exe
+
 # OS
 .DS_Store
 Thumbs.db
